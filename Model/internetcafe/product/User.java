@@ -18,7 +18,7 @@ public abstract class User {
 
 	private String pwd;
 
-
+	private boolean log;
 
 	public String getId() {
 		return id;
@@ -36,6 +36,17 @@ public abstract class User {
 		this.pwd = pwd;
 	}
 
+	public boolean isLog() {
+		return log;
+	}
+
+	public void setLog(boolean log) {
+		this.log = log;
+	}
+
+	public void logCheck() {
+
+	}
 
 	@Override
 	public String toString() {
