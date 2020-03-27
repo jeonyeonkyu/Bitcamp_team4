@@ -1,12 +1,12 @@
-package internetcafe.product;
+package internetcafe.user;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import internetcafe.Transaction;
-import internetcafe.user.ChargedTime;
-import internetcafe.user.Product;
+import internetcafe.product.ChargedTime;
+import internetcafe.product.Product;
 
 /*
 * 클래스명 : Customer // 손님에 대한 클래스

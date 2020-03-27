@@ -1,8 +1,7 @@
-package internetcafe.user;
-
-
+package internetcafe.product;
 
 import java.util.*;
+
 /*
 * 클래스명 : Drink //음료수를 위한 클래스
 * 
@@ -14,7 +13,7 @@ import java.util.*;
 */
 public class Drink extends Product {
 
-    public Drink() {
-    }
+	public Drink() {
+	}
 
 }

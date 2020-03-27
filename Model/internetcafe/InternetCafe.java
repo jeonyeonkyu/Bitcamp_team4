@@ -17,11 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-import internetcafe.product.Administrator;
-import internetcafe.product.Member;
-import internetcafe.product.Nonmember;
-import internetcafe.product.UserInfo;
-import internetcafe.user.Product;
+import internetcafe.product.Product;
+import internetcafe.user.Administrator;
+import internetcafe.user.Customer;
+import internetcafe.user.Member;
+import internetcafe.user.Nonmember;
+import internetcafe.user.UserInfo;
 
 /*
 * 클래스명 : InternetCafe // 피시방 클래스
@@ -33,7 +34,7 @@ import internetcafe.user.Product;
 * 작업자 : 전연규
 * 회원가입 기능에 정규표현식으로 확인하기 추가
 * 셀렉트 좌석에 좌석 선택 후 로그인 하기 기능 추가
-* 비회원 이 없어서 전역변수인  seat를 Member[][] seat로 변경
+* 비회원 이 없어서 전역변수인  seat를 Customer[][] seat로 변경
 *  // 휴대폰 번호 추가해야됨
 */
 public class InternetCafe {
@@ -42,14 +43,15 @@ public class InternetCafe {
 	private static final int MAX_COL_INDEX = 5;
 	private HashMap<String, Member> memberList;
 	private List<Nonmember> nonmemberList;
-	private List<Product> foodlist;
-	private Member[][] seat;
+	private HashMap<String, Product> foodList;
+	private Customer[][] seat;
+	private Administrator admin;
 
 	public InternetCafe() {
 		this.memberList = new HashMap<String, Member>();
 		this.seat = new Member[MAX_ROW_INDEX][MAX_COL_INDEX];
 		this.nonmemberList = new ArrayList<Nonmember>();
-		this.foodlist = new ArrayList<Product>();
+		this.foodList = new HashMap<String, Product>();
 		loadMemberList();
 
 	}
@@ -59,7 +61,7 @@ public class InternetCafe {
 
 			String path = "C:\\internetCafe\\customer.txt";
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), "euc-kr"));
-			
+
 			String line = "";
 			while ((line = reader.readLine()) != null) {
 				String[] array = line.split(",");
@@ -68,8 +70,7 @@ public class InternetCafe {
 				member.setId(array[0]);
 				member.setPwd(array[1]);
 				member.setName(array[2]);
-				member.setMoney(Integer.parseInt(array[3]));
-				member.setTotalplaytime(Integer.parseInt(array[4]));
+				member.setTotalplaytime(Integer.parseInt(array[3]));
 				getmemberList().put(array[0], member);
 			}
 
@@ -118,93 +119,90 @@ public class InternetCafe {
 
 	}
 
-	public void logout(int row, int col) {
+	public void logout(int row, int col, Scanner sc) {
 		if (seat[row][col] != null) {
 			seat[row][col] = null;
-		} 
-		loadMemberList();
+		}
 		Member member = new Member();
-		  // 원본파일경로
-		  String fileName = "C:\\internetCafe\\customer.txt";
+		// 원본파일경로
+		String fileName = "C:\\internetCafe\\customer.txt";
 
-		  // file 객체 생성
-		  File inputFile = new File(fileName);
-		  File outputFile = new File(fileName+".temp");
+		// file 객체 생성
+		File inputFile = new File(fileName);
+		File outputFile = new File(fileName + ".temp");
 
-		  FileInputStream fileInputStream = null;
-		  BufferedReader bufferedReader = null;
-		  FileOutputStream fileOutputStream = null;
-		  BufferedWriter bufferedWriter = null;
+		FileInputStream fileInputStream = null;
+		BufferedReader bufferedReader = null;
+		FileOutputStream fileOutputStream = null;
+		BufferedWriter bufferedWriter = null;
 
-		  boolean result = false;
+		boolean result = false;
 
-		  try {
-		   // FileInputStream,FileOutputStream, BufferdReader, BufferedWriter
-		   // 생성
-		   fileInputStream = new FileInputStream(inputFile);
-		   fileOutputStream = new FileOutputStream(outputFile);
+		try {
+			// FileInputStream,FileOutputStream, BufferdReader, BufferedWriter
+			// 생성
+			fileInputStream = new FileInputStream(inputFile);
+			fileOutputStream = new FileOutputStream(outputFile);
 
-		   bufferedReader = new BufferedReader(new InputStreamReader(
-		     fileInputStream));
-		   bufferedWriter = new BufferedWriter(new OutputStreamWriter(
-		     fileOutputStream));
+			bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
+			bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
 
-		   // 원본 파일에서 읽어 들이는 한라인
-		   String line;
-		   // 패턴에 일치하는 문자로 대체하고 난 후의 string
-		   String repLine;
+			// 원본 파일에서 읽어 들이는 한라인
+			String line;
+			// 패턴에 일치하는 문자로 대체하고 난 후의 string
+			String repLine;
 
-		   // 바꾸고자 하는 string과 바꿀 string 정의
-		   String originalString = member.getId() + "," + member.getPwd() + "," + member.getName() + "," + member.getMoney()
-			+ "," + member.getTotalplaytime();
-		   String replaceString =  member.getId() + "," + member.getPwd() + "," + member.getName() + "," + member.getMoney()
-			+ "," + member.getTotalplaytime();
+			// 바꾸고자 하는 string과 바꿀 string 정의
+			String originalString = "";
+			while (true) {
+				if (memberList.get(member).equals(login(sc))) {
+					originalString = memberList.get(member.getId()) + "," + memberList.get(member.getPwd()) + ","
+							+ memberList.get(member.getName()) +   ","
+							+ memberList.get(member.getTotalplaytime());
+					break;
+				}
+			}
+			String replaceString = member.getId() + "," + member.getPwd() + "," + member.getName() + ","
+					 + member.getTotalplaytime();
 
-		   // 원본 파일에서 한라인씩 읽는다.
-		   while ((line = bufferedReader.readLine()) != null) {
-		    // 일치하는 패턴에서는 바꿀 문자로 변환
-		    repLine = line.replaceAll(originalString, replaceString);
+			// 원본 파일에서 한라인씩 읽는다.
+			while ((line = bufferedReader.readLine()) != null) {
+				// 일치하는 패턴에서는 바꿀 문자로 변환
+				repLine = line.replaceAll(originalString, replaceString);
 
-		    // 새로운 파일에 쓴다.
-		    bufferedWriter.write(repLine, 0, repLine.length());
-		    bufferedWriter.newLine();
-		   }
-		   // 정상적으로 수행되었음을 알리는 flag
-		   result = true;
-		  } catch (IOException ex) {
-		   ex.printStackTrace();
-		  } finally {
-		   // 리소스 해제. 개별적으로 해제한다.
-		   try {
-		    bufferedReader.close();
-		   } catch (IOException ex1) {
-		    ex1.printStackTrace();
-		   }
-		   try {
-		    bufferedWriter.close();
-		   } catch (IOException ex2) {
-		    ex2.printStackTrace();
-		   }
+				// 새로운 파일에 쓴다.
+				bufferedWriter.write(repLine, 0, repLine.length());
+				bufferedWriter.newLine();
+			}
+			// 정상적으로 수행되었음을 알리는 flag
+			result = true;
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			// 리소스 해제. 개별적으로 해제한다.
+			try {
+				bufferedReader.close();
+			} catch (IOException ex1) {
+				ex1.printStackTrace();
+			}
+			try {
+				bufferedWriter.close();
+			} catch (IOException ex2) {
+				ex2.printStackTrace();
+			}
 
-		   // 정상적으로 수행되었을 경우 원본 파일을 지우고 새로운 파일명을 원본파일명으로 rename한다.
-		   if (result) {
-		    inputFile.delete();
-		    outputFile.renameTo(new File(fileName));
-		   }
-		  }
-		
+			// 정상적으로 수행되었을 경우 원본 파일을 지우고 새로운 파일명을 원본파일명으로 rename한다.
+			if (result) {
+				inputFile.delete();
+				outputFile.renameTo(new File(fileName));
+			}
+		}
+
 		System.out.println("로그아웃 되셨습니다");
 	}
 
-	public void showMain(Scanner sc) {
-		System.out.println("=====어서오세요 4조피시방=====");
-		System.out.println("이용하려면 아무키나 입력하세요: ");
-		String touch = sc.nextLine();
-
-		if (touch.equals("admin")) {
-			adminMenu(sc);
-		}
-		showSeat();
+	public void setfoodList(HashMap<String, Product> foodList) {
+		this.foodList = foodList;
 	}
 
 	public void showSeat() {
@@ -215,6 +213,160 @@ public class InternetCafe {
 			System.out.println();
 		}
 
+	}
+
+	public void showMain(Scanner sc) {
+
+		System.out.println("아무 키나 입력하시오.");
+		String input = sc.nextLine();
+		if (input.equals("admin")) {
+			adminPageSelect(sc);
+		}
+		selectCustomerMenu(sc);
+	}
+
+	public int adminPage(Scanner sc) {
+		int menu = 0;
+		do {
+			try {
+				System.out.println("관리자 페이지 입니다.");
+				System.out.println("1. 관리자 로그인");
+				System.out.println("2. 나가기");
+				menu = Integer.parseInt(sc.nextLine());
+				if (menu == 1 || menu == 2) {
+					break;
+				} else {
+					throw new Exception("메뉴를 잘못 입력하셨습니다.");
+				}
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+
+		} while (true);
+
+		return menu;
+	}
+
+	public void adminPageSelect(Scanner sc) {
+		while (true) {
+			int menunum = adminPage(sc);
+			Loop_1: switch (menunum) {
+			case 1:
+				System.out.println("아이디를 입력해주세요.");
+				String adminid = sc.nextLine();
+				if (!adminid.equals(admin.getId())) {
+					System.out.println("잘못 입력하셨습니다.");
+					break Loop_1;
+				}
+				System.out.println("비밀번호를 입력해주세요.");
+				String adminpwd = sc.nextLine();
+				if (!adminpwd.equals(admin.getPwd())) {
+					System.out.println("잘못 입력하셨습니다.");
+					break Loop_1;
+				}
+				selectAdminMenu(sc);
+				break;
+			case 2:
+				showMain(sc);
+				break;
+			}
+		}
+	}
+
+	public int displayAdminMenu(Scanner sc) {
+		int menu = 0;
+		do {
+			try {
+				System.out.println("*****관리자 메뉴******");
+				System.out.println("1. 물품 추가");
+				System.out.println("2. 물품 삭제");
+				System.out.println("3. 매장 매출 확인");
+				System.out.println("4. 회원 리스트 확인");
+				System.out.println("5. 처음으로 돌아가기");
+				System.out.println("*******************");
+				menu = Integer.parseInt(sc.nextLine());
+				if (menu >= 1 && menu <= 5) {
+					break;
+				} else {
+					throw new Exception("메뉴를 잘못 입력하셨습니다.");
+				}
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				System.out.println("메뉴는 1~5번까지 입니다.");
+				System.out.println("다시 입력해주세요.");
+			}
+		} while (true);
+		return menu;
+	}
+
+	public void selectAdminMenu(Scanner sc) {
+		int menunum = displayAdminMenu(sc);
+		switch (menunum) {
+		case 1:
+			admin.addProduct();
+
+			break;
+		case 2:
+			admin.delProduct();
+			break;
+		case 3:
+			admin.showTotalMoney(this);
+			break;
+		case 4:
+			admin.showMemberList();
+			break;
+		case 5:
+			showMain(sc);
+			break;
+		}
+	}
+
+	public int customerMenu(Scanner sc) {
+		int menu = 0;
+		do {
+			try {
+				System.out.println("*******************");
+				System.out.println("1. 이용시간 추가 및 조회");
+				System.out.println("2. 음식 주문");
+				System.out.println("3. 계산하기");
+				System.out.println("4. 로그아웃");
+				System.out.println("5. 나가기");
+				System.out.println("*******************");
+				menu = Integer.parseInt(sc.nextLine());
+				if (menu >= 1 && menu <= 4) {
+					break;
+				} else {
+					throw new Exception("메뉴를 잘못 입력하셨습니다.");
+				}
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				System.out.println("메뉴는 1~5번까지 입니다.");
+				System.out.println("다시 입력해주세요.");
+			}
+		} while (true);
+		return menu;
+	}
+
+	public void selectCustomerMenu(Scanner sc) {
+		int menunum = customerMenu(sc);
+		switch (menunum) {
+		case 1:
+
+			break;
+		case 2:
+			admin.showFoodList();
+
+			break;
+		case 3:
+
+			break;
+		case 4:
+			break;
+		case 5:
+			System.out.println("안녕히 가세요.");
+			System.exit(0);
+
+		}
 	}
 
 	/*
@@ -300,8 +452,8 @@ public class InternetCafe {
 
 					// 4번 로그아웃 아래
 					System.out.println("로그아웃 하시겠습니까? ,1 입력 ");
-					if(Integer.parseInt(sc.next()) == 1 ){
-					logout(row, col);
+					if (Integer.parseInt(sc.next()) == 1) {
+						logout(row, col, sc);
 					}
 					// 로그아웃 위
 					return;
@@ -315,50 +467,6 @@ public class InternetCafe {
 			}
 
 		} while (true);
-
-	}
-
-	private void adminMenu(Scanner sc) {
-		System.out.println("관리자 페이지입니다.");
-		System.out.println("비밀번호를 입력해주세요>> ");
-		String admin_pw = sc.nextLine();
-
-		// 비번이 맞으면 관리자메뉴 오픈
-		if (admin_pw.equals("admin") == true) {
-			Administrator admin = new Administrator();
-			System.out.println("1. 메뉴추가    2.메뉴삭제    3.정산   4.이용자명단");
-			int admin_select = sc.nextInt();
-			sc.nextLine();
-
-			switch (admin_select) {
-
-			case 1:
-				admin.addProduct();
-				break;
-
-			case 2:
-				admin.delProduct();
-				break;
-
-			case 3:
-				admin.showTotalMoney();
-				break;
-
-			case 4:
-				admin.showMemberList();
-				break;
-
-			case 5:
-				System.out.println("이용해주셔서 감사합니다");
-				showMain(sc);
-
-			default:
-				System.out.println("잘못된 메뉴입니다. 다시 입력해주세요. ");
-				break;
-
-			}
-
-		}
 
 	}
 
@@ -387,8 +495,8 @@ public class InternetCafe {
 			}
 			bw = new BufferedWriter(new FileWriter(path, true));
 			writer = new PrintWriter(bw, true);
-			String writeMember = member.getId() + "," + member.getPwd() + "," + member.getName() + "," + member.getMoney()
-					+ "," + member.getTotalplaytime();
+			String writeMember = member.getId() + "," + member.getPwd() + "," + member.getName() + ","
+					 + "," + member.getTotalplaytime();
 			// 기존 파일의 내용에 이어서 쓰려면 true를, 기존 내용을 없애고 새로 쓰려면 false를 지정한다.
 			writer.write(writeMember + "\n");
 			writer.flush();
@@ -424,25 +532,17 @@ public class InternetCafe {
 		this.nonmemberList = nonmemberList;
 	}
 
-	public List<Product> getFoodlist() {
-		return foodlist;
-	}
-
-	public void setFoodlist(List<Product> foodlist) {
-		this.foodlist = foodlist;
-	}
-
-	public Member[][] getSeat() {
+	public Customer[][] getSeat() {
 		return seat;
 	}
 
-	public void setSeat(Member[][] seat) {
+	public void setSeat(Customer[][] seat) {
 		this.seat = seat;
 	}
 
 	@Override
 	public String toString() {
-		return "InternetCafe [memberList=" + memberList + ", nonmemberList=" + nonmemberList + ", foodlist=" + foodlist
+		return "InternetCafe [memberList=" + memberList + ", nonmemberList=" + nonmemberList + ", foodList=" + foodList
 				+ ", seat=" + Arrays.toString(seat) + "]";
 	}
 

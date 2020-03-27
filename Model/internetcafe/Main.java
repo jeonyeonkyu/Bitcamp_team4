@@ -1,4 +1,5 @@
 package internetcafe;
+
 import java.util.Scanner;
 
 /*
@@ -14,7 +15,7 @@ import java.util.Scanner;
 public class Main {
 
 	public static void main(String[] args) {
-		
+
 		InternetCafe internetCafe = new InternetCafe();
 
 		System.out.println(internetCafe.getmemberList());
@@ -23,7 +24,7 @@ public class Main {
 		internetCafe.signUp(sc);
 		internetCafe.selectSeat(sc);
 		internetCafe.showSeat();
-		
+
 	}
 
 }

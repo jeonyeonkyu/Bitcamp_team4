@@ -1,4 +1,4 @@
-package internetcafe.product;
+package internetcafe.user;
 
 /*
 * 클래스명 : Member // (회원가입한 손님 ) = 멤버에 대한 클래스
@@ -14,13 +14,14 @@ public class Member extends Customer {
 	public Member() {
 
 	}
-	public Member(String id, String pwd, String name,int money, int totalplaytime) {
+
+	public Member(String id, String pwd, String name, int totalplaytime) {
 		this.setId(id);
 		this.setPwd(pwd);
 		this.setName(name);
-		this.setMoney(money);
 		this.setTotalplaytime(totalplaytime);
 	}
+
 	private String name;
 
 	public String getName() {

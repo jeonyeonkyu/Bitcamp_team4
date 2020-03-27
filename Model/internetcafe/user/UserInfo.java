@@ -1,4 +1,4 @@
-package internetcafe.product;
+package internetcafe.user;
 
 import java.util.HashMap;
 import java.util.Scanner;

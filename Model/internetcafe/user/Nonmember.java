@@ -1,8 +1,4 @@
-package internetcafe.product;
-
-
-
-import java.util.*;
+package internetcafe.user;
 
 /*
 * 클래스명 : Nonmember // 비회원에 대한 클래스

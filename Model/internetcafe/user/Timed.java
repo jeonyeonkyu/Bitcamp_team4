@@ -1,8 +1,8 @@
-package internetcafe.product;
+package internetcafe.user;
 
-
- //일단 건들지 말기
+//일단 건들지 말기
 import java.util.*;
+
 /*
 * 클래스명 : Timed //시간 스레드로 만들기
 * 
@@ -12,15 +12,15 @@ import java.util.*;
 * 
 * 작업자 : 전연규
 */
-public class Timed{
+public class Timed {
 
-    public Timed() {
-    }
+	public Timed() {
+	}
 
-    public void start() {
-    }
+	public void start() {
+	}
 
-    public void stop() {
-    }
+	public void stop() {
+	}
 
 }

@@ -1,8 +1,8 @@
 package internetcafe;
 
-
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 /*
 * 클래스명 : Date // 거래내역 시간에 대한 클래스
 * 
@@ -14,13 +14,13 @@ import java.util.*;
 */
 public class Date {
 
-    public Date() {
-    }
+	public Date() {
+	}
 
-    private Date today;
+	private Date today;
 
-    private SimpleDateFormat date;
+	private SimpleDateFormat date;
 
-    private SimpleDateFormat time;
+	private SimpleDateFormat time;
 
 }
